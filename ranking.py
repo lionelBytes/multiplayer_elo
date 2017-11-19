@@ -1,4 +1,5 @@
 """ was made referring to METIN'S MEDIA & MATH: HOW TO CALCULATE THE ELO-RATING """
+import logging
 from collections import defaultdict
 from itertools import izip, tee
 
@@ -8,6 +9,10 @@ AISTIS = 'aistis'
 ALL_PLAYERS = {MATT, LIONEL, AISTIS}
 
 SIGMA = 400.  # type: float
+K_FACTOR = 32  # 32 is suggested on Metin's Media & Math
+
+logger = logging.getLogger("elo_ranking")
+logging.basicConfig(level=logging.INFO)
 
 ratings = defaultdict(dict)
 ratings[0] = {MATT: 1200, LIONEL: 1200, AISTIS: 1200}
@@ -76,9 +81,30 @@ def gen_win_pairs_from_result(performances):
     return two_player_game_results
 
 
+def calc_multiplayer_updates(performances, player_elos):
+
+    updates = defaultdict(list)
+    for player_a, player_b, result in gen_win_pairs_from_result(performances):
+        expected_a, expected_b = calc_expected_score(player_elos[player_a], player_elos[player_b])
+        result_a = result
+        result_b = 1 - result
+
+        updates[player_a].append(K_FACTOR * (result_a - expected_a))
+        updates[player_b].append(K_FACTOR * (result_b - expected_b))
+
+    return updates
 
 
+def apply_multiplayer_updates(performances, player_elos):
 
+    all_updates = calc_multiplayer_updates(performances, player_elos)
+    updated_elos = player_elos.copy()
+    for player_name, player_updates in all_updates.items():
+        total_update = sum(player_updates)
+        updated_elos[player_name] += total_update
+        logger.info("%s's new Elo score: %.3f (%+.3f)" % (player_name, updated_elos[player_name], total_update))
+    return updated_elos
 
-
-
+if __name__ == "__main__":
+    apply_multiplayer_updates((('matt', 85), ('aistis', 78), ('lionel', 55)),
+                              {'matt': 1200, 'lionel': 1200, 'aistis': 1200})
