@@ -1,3 +1,4 @@
+
 """ was made referring to METIN'S MEDIA & MATH: HOW TO CALCULATE THE ELO-RATING """
 import logging
 from collections import defaultdict
@@ -7,6 +8,8 @@ MATT = 'matt'
 LIONEL = 'lionel'
 AISTIS = 'aistis'
 ALL_PLAYERS = {MATT, LIONEL, AISTIS}
+
+INITIAL_RATING = 1200.
 
 SIGMA = 400.  # type: float
 K_FACTOR = 32  # 32 is suggested on Metin's Media & Math
@@ -83,6 +86,8 @@ def gen_win_pairs_from_result(performances):
 
 def calc_multiplayer_updates(performances, player_elos):
 
+    init_new_elo_score_if_required(performances, player_elos)
+
     updates = defaultdict(list)
     for player_a, player_b, result in gen_win_pairs_from_result(performances):
         expected_a, expected_b = calc_expected_score(player_elos[player_a], player_elos[player_b])
@@ -93,6 +98,25 @@ def calc_multiplayer_updates(performances, player_elos):
         updates[player_b].append(K_FACTOR * (result_b - expected_b))
 
     return updates
+
+
+def init_new_elo_score_if_required(performances, elo_scores):
+
+    def get_user_input(player_name):
+        return raw_input("do you want to add %s as new player? (y/n)" % player_name)
+
+    for (player_name, _) in performances:
+        if player_name not in elo_scores.keys():
+            user_input = get_user_input(player_name)
+            while not user_input.startswith(('y', 'Y', 'n', 'N')):
+                user_input = get_user_input(player_name)
+            if user_input[0].lower() == 'n':
+                raise ValueError("unable to proceed - no record for player '%s'" % player_name)
+
+            # add new player
+            logger.info("adding new player '%s' with initial elo rating %g" % (player_name, INITIAL_RATING))
+            elo_scores[player_name] = INITIAL_RATING
+
 
 
 def apply_multiplayer_updates(performances, player_elos):
@@ -106,5 +130,8 @@ def apply_multiplayer_updates(performances, player_elos):
     return updated_elos
 
 if __name__ == "__main__":
-    apply_multiplayer_updates((('matt', 85), ('aistis', 78), ('lionel', 55)),
-                              {'matt': 1200, 'lionel': 1200, 'aistis': 1200})
+    # apply_multiplayer_updates((('matt', 85), ('aistis', 78), ('lionel', 55)),
+    # apply_multiplayer_updates((('matt', 80), ('will', 45), ('lionel', 60)),
+    apply_multiplayer_updates((('matt', 47), ('jon', 62), ('irina', 48), ('aistis', 64), ('jack', 35)),
+                              {'matt': 1230.530, 'lionel': 1186.206, 'aistis': 1200, 'will': 1183.264,
+                               'jon': 1200, 'irina': 1200.00})
