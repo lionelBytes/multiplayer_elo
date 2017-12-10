@@ -86,7 +86,7 @@ def gen_win_pairs_from_result(performances):
 
 def calc_multiplayer_updates(performances, player_elos):
 
-    init_new_elo_score_if_required(performances, player_elos)
+    init_any_new_players(performances, player_elos)
 
     updates = defaultdict(list)
     for player_a, player_b, result in gen_win_pairs_from_result(performances):
@@ -100,7 +100,15 @@ def calc_multiplayer_updates(performances, player_elos):
     return updates
 
 
-def init_new_elo_score_if_required(performances, elo_scores):
+def init_any_new_players(performances, elo_scores):
+    """
+    queries the user whether to add previously unseen player names (if any) in the performances input
+    doesn't just add automatically because the user could have made a typo
+    new players are initialised to the default starting score.
+    :param performances: player performances in the current game
+    :param elo_scores: previously recorded scores
+    :return: None (scores are stored in dict (mutable) so no need to return them)
+    """
 
     def get_user_input(player_name):
         return raw_input("do you want to add %s as new player? (y/n)" % player_name)
