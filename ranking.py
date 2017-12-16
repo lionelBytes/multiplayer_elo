@@ -18,7 +18,7 @@ logger = logging.getLogger("elo_ranking")
 logging.basicConfig(level=logging.INFO)
 
 ratings = defaultdict(dict)
-ratings[0] = {MATT: 1200, LIONEL: 1200, AISTIS: 1200}
+ratings["game1"] = {MATT: 1200, LIONEL: 1200, AISTIS: 1200}
 
 new_result = (MATT, AISTIS, LIONEL)
 
@@ -110,17 +110,11 @@ def init_any_new_players(performances, elo_scores):
     :return: None (scores are stored in dict (mutable) so no need to return them)
     """
 
-    def get_user_input(player_name):
-        return raw_input("do you want to add %s as new player? (y/n)" % player_name)
+    # TODO: move user checking to frontend
+
 
     for (player_name, _) in performances:
         if player_name not in elo_scores.keys():
-            user_input = get_user_input(player_name)
-            while not user_input.startswith(('y', 'Y', 'n', 'N')):
-                user_input = get_user_input(player_name)
-            if user_input[0].lower() == 'n':
-                raise ValueError("unable to proceed - no record for player '%s'" % player_name)
-
             # add new player
             logger.info("adding new player '%s' with initial elo rating %g" % (player_name, INITIAL_RATING))
             elo_scores[player_name] = INITIAL_RATING
