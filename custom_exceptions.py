@@ -14,5 +14,11 @@ class NotFound(ApiException):
 
 class Exists(ApiException):
     def __init__(self, message):
-        super(ApiException, self).__init__(message)
+        super(Exists, self).__init__(message)
         self.status = 409
+
+
+class NotAllowed(ApiException):
+    def __init__(self, message):
+        super(NotAllowed, self).__init__(message)
+        self.status = 403

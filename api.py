@@ -102,6 +102,12 @@ class ApiResource(object):
 
     def add_game(self, league, game_end, scores):
         scores = {s['player']: s['score'] for s in scores}
+        players = scores.keys()
+        not_found = set(players).difference({p['name']
+                                             for p in self.db.players()})
+        if not_found:
+            raise custom_exceptions.NotAllowed(
+                "Players unknown in this league: {}".format(not_found))
         game_end = dt_parser.parse(game_end)
 
         # save the game first

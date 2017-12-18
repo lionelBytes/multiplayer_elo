@@ -37,7 +37,6 @@ class TestApi(FalconTestCase):
                                       params={'league': 'league1'})
         self.assertEqual(response.status, HTTP_CONFLICT)
 
-
     def test_leagues(self):
         # 1. db should be empty
         result = self.simulate_get('/leagues')
@@ -74,6 +73,26 @@ class TestApi(FalconTestCase):
         # assert nothing has changed in the first league
         resp = self.simulate_get('/players', params={'league': 'league1'})
         self.assertEqual(resp.json, [{"name": "player1"}])
+
+    def test_add_game_with_unknown_players_fails(self):
+        # add a league with two players
+        self.simulate_post('/league', body=json.dumps({"name": "league1"}))
+        self.simulate_post('/player', params={"league": "league1"},
+                           body=json.dumps({"name": "player1"}))
+        self.simulate_post('/player', params={"league": "league1"},
+                           body=json.dumps({"name": "player2"}))
+
+        # add a game with two known and an unknown player
+        req = {"game_end": "2017-12-17T19:10",
+               "scores": [{"player": "player1", "score": 5},
+                          {"player": "player2", "score": 4},
+                          {"player": "player3", "score": 3}]}
+
+        res = self.simulate_post('/game',
+                                 params={"league": "league1"},
+                                 body=json.dumps(req))
+        assert res.status_code == 403
+
 
     def test_games_and_ratings(self):
         # add a league and four players
