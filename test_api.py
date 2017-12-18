@@ -124,9 +124,9 @@ class TestApi(FalconTestCase):
                            params={"league": "league1"},
                            body=json.dumps({
                                "game_end": "2017-12-17T19:10",
-                               "scores": [{"player": "player1", "score": 5},
+                               "scores": [{"player": "player1", "score": 3},
                                           {"player": "player2", "score": 4},
-                                          {"player": "player3", "score": 3}]}))
+                                          {"player": "player3", "score": 5}]}))
 
         # assert the game is tracked
         self.assertEqual(self.simulate_get('/games',
@@ -134,10 +134,10 @@ class TestApi(FalconTestCase):
                          [{"game_end": "2017-12-17T19:10:00",
                            "players": ["player1", "player2", "player3"]}])
 
-        # assert the ratings are updated
+        # assert the ratings are updated, and sorted
         self.assertEqual(self.simulate_get('/ratings',
                                            params={"league": "league1"}).json,
-                         [{"player": "player1", "rating": 1216},
+                         [{"player": "player3", "rating": 1216},
                           {"player": "player2", "rating": INITIAL_RATING},
-                          {"player": "player3", "rating": 1184},
-                          {"player": "player4", "rating": INITIAL_RATING}])
+                          {"player": "player4", "rating": INITIAL_RATING},
+                          {"player": "player1", "rating": 1184}])

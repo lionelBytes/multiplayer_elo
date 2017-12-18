@@ -1,5 +1,6 @@
 import logging
 
+from sqlalchemy import desc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship, sessionmaker, scoped_session
 from sqlalchemy import Column, ForeignKey, Integer, String, create_engine, \
@@ -56,8 +57,8 @@ class PlayerRating(Base):
     id = Column(Integer, primary_key=True)
     rating = Column(Float)
 
-    league_id = Column(Integer, ForeignKey('leagues.id'))
-    player_id = Column(Integer, ForeignKey('players.id'))
+    league_id = Column(Integer, ForeignKey('leagues.id'), nullable=False)
+    player_id = Column(Integer, ForeignKey('players.id'), nullable=False)
 
     league = relationship("League")
     player = relationship("Player", back_populates='player_ratings')
@@ -68,9 +69,9 @@ class Game(Base, Serializable):
     __tablename__ = 'games'
 
     id = Column(Integer, primary_key=True)
-    game_end = Column(DateTime)
+    game_end = Column(DateTime, nullable=False)
 
-    league_id = Column(Integer, ForeignKey('leagues.id'))
+    league_id = Column(Integer, ForeignKey('leagues.id'), nullable=False)
 
     league = relationship("League", back_populates="games")
     player_game_scores = relationship("PlayerGameScore")
@@ -88,8 +89,8 @@ class PlayerGameScore(Base):
     id = Column(Integer, primary_key=True)
     score = Column(Float)
 
-    game_id = Column(Integer, ForeignKey('games.id'))
-    player_id = Column(Integer, ForeignKey('players.id'))
+    game_id = Column(Integer, ForeignKey('games.id'), nullable=False)
+    player_id = Column(Integer, ForeignKey('players.id'), nullable=False)
 
     game = relationship("Game", back_populates="player_game_scores")
     player = relationship("Player", back_populates="player_game_scores")
@@ -156,7 +157,8 @@ class DB(object):
     def ratings(self, league_name, players=None):
         ratings = self.session.query(PlayerRating) \
             .join(PlayerRating.league) \
-            .filter(League.name == league_name)
+            .filter(League.name == league_name) \
+            .order_by(desc(PlayerRating.rating))
         if players:
             ratings = ratings.join(PlayerRating.player) \
                     .filter(Player.name.in_(players))
@@ -172,12 +174,11 @@ class DB(object):
         player_rating.rating = rating
         self.session.add(player_rating)
         self.session.commit()
-        return rating
 
     def add_league(self, league_name):
         if self.session.query(League).filter_by(name=league_name).count() > 0:
             raise Exists("league {} already exists!".format(league_name))
-        return self.create(League, name=league_name).serialized()
+        self.create(League, name=league_name)
 
     def add_player(self, name, rating, league_name=None):
         p, _ = self.get_or_create(Player, name=name)
@@ -195,8 +196,7 @@ class DB(object):
     def add_game(self, game_end, scores, league_name):
         league = self.session.query(League).filter_by(name=league_name).first()
 
-        game, c = self.get_or_create(Game, league=league, game_end=game_end)
-        assert c
+        game = self.create(Game, league=league, game_end=game_end)
 
         for player_name, score in scores.items():
             player = self.session.query(Player) \
