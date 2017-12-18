@@ -85,8 +85,8 @@ class ApiResource(object):
     def add_league(self, name):
         return self.db.add_league(name)
 
-    def get_league(self, league_id):
-        return tuple(self.db.leagues(league_id))
+    def get_league(self, name):
+        return tuple(self.db.leagues(name))
 
     def get_ratings(self, league):
         return tuple(self.db.ratings(league))
