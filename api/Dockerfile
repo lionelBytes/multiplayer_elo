@@ -9,4 +9,4 @@ RUN python -m unittest discover
 
 EXPOSE 8000
 
-CMD gunicorn -b 0.0.0.0:8000 "api:create()"
+CMD gunicorn -b 0.0.0.0:8000 "app:create()"

@@ -1,0 +1,48 @@
+{%- extends "base.html" %}
+
+{% import "bootstrap/utils.html" as utils %}
+
+{% block content %}
+  <div class="container">
+  {%- with messages = get_flashed_messages(with_categories=True) %}
+  {%- if messages %}
+    <div class="row">
+      <div class="col-md-12">
+        {{utils.flashed_messages(messages)}}
+      </div>
+    </div>
+  {%- endif %}
+  {%- endwith %}
+
+    <div class="jumbotron">
+      <h1>Available Leagues</h1>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">League</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for league in leagues %}
+          <tr>
+            <td>
+              <a href="/{{ league.name }}" class="list-group-item active">{{ league.name }}</a>
+            </td>
+          </tr>
+        {% endfor %}
+          <tr>
+            <td>
+              <form method="POST" action="/">
+                {{ form.csrf_token }}
+                Add a new League {{ form.name(size=80) }}
+                <input type="submit" value="Add">
+              </form>
+            </td>
+        </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+   </div>
+{%- endblock %}

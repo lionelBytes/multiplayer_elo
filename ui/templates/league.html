@@ -1,0 +1,64 @@
+{%- extends "base.html" %}
+
+{% import "bootstrap/utils.html" as utils %}
+
+{% block content %}
+  <div class="container">
+    {{ messages }}
+  {%- with messages = get_flashed_messages(with_categories=True) %}
+  {%- if messages %}
+    <div class="row">
+      <div class="col-md-12">
+        {{utils.flashed_messages(messages)}}
+      </div>
+    </div>
+  {%- endif %}
+  {%- endwith %}
+
+    <div>
+      <h1>{{ league }}</h1>
+      <form method="POST" action="/{{ league }}">
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Player</th>
+            <th scope="col">Rating</th>
+            <th scope="col">Track Game Score</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for score_form in score_forms %}
+          <tr>
+            <th scope="row">{{ loop.index }}</th>
+            <td>{{ ratings[score_form.player._value()].player }}</td>
+            <td>{{ ratings[score_form.player._value()].rating }}</td>
+            <td>{{ score_form.csrf_token }}{{ score_form.player}}{{ score_form.score }}</td>
+          </tr>
+        {% endfor %}
+          <tr>
+            <th scope="row">
+              <input type="submit" value="Add Player">
+            </th>
+            <td>
+              {{ player_form.csrf_token }}
+              {{ player_form.name }}
+            </td>
+        </tr>
+        <tr>
+          <th scope="row"></th>
+          <td></td>
+          <td></td>
+          <td>
+            <input class="btn btn-lg btn-default" role="button"
+               type="submit" value="Add Scores">
+          </td>
+        </tr>
+        </tbody>
+      </table>
+      </form>
+
+    </div>
+
+   </div>
+{%- endblock %}

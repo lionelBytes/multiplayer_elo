@@ -1,17 +1,17 @@
-import dateutil.parser as dt_parser
 import json
 import logging
 import sys
 import traceback
 
+import dateutil.parser as dt_parser
 import falcon
 
+import config as cfg
 import custom_exceptions
 from db import DB
 from ranking import apply_multiplayer_updates, INITIAL_RATING
 
-
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG if cfg.DEBUG else logging.INFO)
 logger = logging.getLogger(__name__)
 
 
@@ -229,7 +229,8 @@ class ApiResource(object):
         return None, falcon.HTTP_CREATED
 
 
-def create(db_uri="sqlite:///elo.db"):
+def create(db_uri=None):
     api = falcon.API()
-    api.add_route('/{resource}', ApiResource(DB(db_uri)))
+    api.add_route('/{resource}',
+                  ApiResource(DB(db_uri or cfg.DB_URI), debug=cfg.DEBUG))
     return api

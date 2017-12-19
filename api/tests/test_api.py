@@ -6,8 +6,8 @@ from tempfile import mkdtemp
 from falcon import HTTP_CONFLICT
 from falcon.testing import TestCase as FalconTestCase
 
-import api
 from ranking import INITIAL_RATING
+import app
 
 
 class TestApi(FalconTestCase):
@@ -16,7 +16,7 @@ class TestApi(FalconTestCase):
         super(TestApi, self).setUp()
         self.tempDir = mkdtemp()
         db_url = os.path.join(self.tempDir, 'test.db')
-        self.app = api.create('sqlite:///' + db_url)
+        self.app = app.create('sqlite:///' + db_url)
 
     def tearDown(self):
         shutil.rmtree(self.tempDir)

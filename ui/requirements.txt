@@ -1,0 +1,7 @@
+Flask==0.12.2
+Flask-Bootstrap==3.3.7.1
+flask-nav==0.6
+Flask-WTF==0.14.2
+gunicorn==19.7.1
+python-slugify==1.2.4
+requests==2.18.4

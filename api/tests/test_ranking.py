@@ -1,5 +1,6 @@
-from unittest import TestCase
 import itertools
+from unittest import TestCase
+
 import ranking
 
 if False:
@@ -32,9 +33,11 @@ class TestRanking(TestCase):
 
     def test_gen_win_pairs_from_result(self):
 
-        self.assertEqual(ranking.gen_win_pairs_from_result(self.result_2_players), [(ALICE, BOB, 1.)])
-        self.assertEqual(ranking.gen_win_pairs_from_result(self.result_4_players),
-                         [(DOGE, ALICE, 1.), (ALICE, BOB, 1.), (BOB, CEVIN, 1.)])
+        self.assertEqual(
+            ranking.gen_win_pairs_from_result(self.result_2_players), [(ALICE, BOB, 1.)])
+        self.assertEqual(
+            ranking.gen_win_pairs_from_result(self.result_4_players),
+            [(DOGE, ALICE, 1.), (ALICE, BOB, 1.), (BOB, CEVIN, 1.)])
 
         # TODO: No test case for drawing scores, as undefined
 
