@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  api:
+    build:
+      context: api
+    ports:
+      - "8000:8000"
+    volumes:
+      - $PWD/db:/app/db
+    environment:
+      - DB_URI=sqlite:////app/db/elo.db
+
+  ui:
+    build:
+      context: ui
+    environment:
+      - ELO_API_URL=http://api:8000
+    ports:
+      - "5000:5000"

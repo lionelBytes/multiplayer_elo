@@ -1,0 +1,22 @@
+{%- extends "base.html" %}
+
+{% import "bootstrap/utils.html" as utils %}
+
+{% block  head %}
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.8.5/showdown.min.js"></script>
+{{super()}}
+{% endblock %}
+
+{% block content %}
+  <div class="container" id="reeeadme">
+
+    {{ readme }}
+
+  </div>
+ <script>
+   var converter = new showdown.Converter(),
+       text = `{{ readme }}`,
+       html      = converter.makeHtml(text);
+       document.getElementById("reeeadme").innerHTML = html;
+ </script>
+{% endblock %}
